@@ -4,32 +4,508 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adaptive Resource Allocation System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; color: #333; }
-        h1 { color: #2c3e50; }
-        .card { background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .btn { display: inline-block; background: #3498db; color: #fff; padding: 10px 15px; text-decoration: none; border-radius: 4px; margin-right: 10px; }
-        .btn:hover { background: #2980b9; }
-        pre { background: #f4f4f4; padding: 10px; overflow-x: auto; border-radius: 4px; }
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --danger: #ef4444;
+            --success: #10b981;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: auto;
+            padding-top: 1rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-start {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-start:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-stop {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-stop:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Metrics */
+        .metric {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+        }
+
+        .progress-bg {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 6px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease;
+        }
+
+        .cpu-fill { background-color: var(--accent); }
+        .ram-fill { background-color: var(--success); }
+        .danger-fill { background-color: var(--danger) !important; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .status-normal {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Console */
+        .console {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            height: 250px;
+            overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .console-item {
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--accent);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .log-throttle {
+            border-left-color: #f59e0b;
+            color: #fcd34d;
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .log-reduce {
+            border-left-color: var(--danger);
+            color: #fca5a5;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>Adaptive Resource Allocation System</h1>
-        <p>A System that dynamically adjusts resource allocation among multiple programs to optimize CPU and memory utilization.</p>
-        
-        <h2>Project Overview</h2>
-        <p>A dynamic resource allocation framework operates within multiprogramming environments where it runs through Python programming code. Real-time CPU and memory usage tracking by the system initiates resource distribution between programs after utility-defined thresholds are breached. The Tkinter GUI provides user interface visibility for the system along with performance improvement demonstrations that overcome system blocking problems.</p>
-        
-        <h2>Download Source Files</h2>
-        <p>
-            <a href="os.py" class="btn">Download os.py</a>
-            <a href="README.md" class="btn">View README</a>
-        </p>
-        
-        <h2>How to Run</h2>
-        <pre><code>pip install psutil
-python os.py</code></pre>
+
+    <div class="dashboard">
+        <div class="header">
+            <h1>Adaptive Resource Allocation</h1>
+            <p style="color: var(--text-muted)">Live System Simulation Dashboard</p>
+        </div>
+
+        <!-- Controls Card -->
+        <div class="card">
+            <div class="card-title">Threshold Settings</div>
+            
+            <div class="control-group">
+                <label>
+                    <span>CPU Threshold</span>
+                    <span id="cpu-thresh-val">80%</span>
+                </label>
+                <input type="range" id="cpu-thresh-input" min="10" max="100" value="80">
+            </div>
+
+            <div class="control-group" style="margin-top: 1rem;">
+                <label>
+                    <span>Memory Threshold</span>
+                    <span id="ram-thresh-val">80%</span>
+                </label>
+                <input type="range" id="ram-thresh-input" min="10" max="100" value="80">
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-start" id="btn-start" onclick="startMonitoring()">Start Monitoring</button>
+                <button class="btn-stop" id="btn-stop" onclick="stopMonitoring()" disabled>Stop Monitoring</button>
+            </div>
+            
+            <div id="system-status" class="status-badge status-normal">
+                System Status: Ready
+            </div>
+        </div>
+
+        <!-- Metrics Card -->
+        <div class="card">
+            <div class="card-title">System Resources</div>
+            
+            <div class="metric">
+                <div class="metric-header">
+                    <span>CPU Usage</span>
+                    <span id="cpu-usage-val">0%</span>
+                </div>
+                <div class="progress-bg">
+                    <div class="progress-fill cpu-fill" id="cpu-bar"></div>
+                </div>
+            </div>
+
+            <div class="metric" style="margin-top: 1rem;">
+                <div class="metric-header">
+                    <span>Memory Usage</span>
+                    <span id="ram-usage-val">0%</span>
+                </div>
+                <div class="progress-bg">
+                    <div class="progress-fill ram-fill" id="ram-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Process Log -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <div class="card-title">Simulated Process Log</div>
+            <div class="console" id="console-log">
+                <div class="console-item" style="color: var(--text-muted); text-align: center; border:none; background:none;">
+                    Monitoring stopped. Press start to simulate processes.
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        // DOM Elements
+        const elCpuThresh = document.getElementById('cpu-thresh-input');
+        const elCpuThreshVal = document.getElementById('cpu-thresh-val');
+        const elRamThresh = document.getElementById('ram-thresh-input');
+        const elRamThreshVal = document.getElementById('ram-thresh-val');
+        
+        const btnStart = document.getElementById('btn-start');
+        const btnStop = document.getElementById('btn-stop');
+        
+        const elCpuUsageVal = document.getElementById('cpu-usage-val');
+        const elCpuBar = document.getElementById('cpu-bar');
+        const elRamUsageVal = document.getElementById('ram-usage-val');
+        const elRamBar = document.getElementById('ram-bar');
+        const elSystemStatus = document.getElementById('system-status');
+        
+        const consoleLog = document.getElementById('console-log');
+
+        // State variables
+        let isMonitoring = false;
+        let cpuUsage = 20;
+        let ramUsage = 30;
+        let simInterval1;
+        let simInterval2;
+        let activePrograms = [];
+
+        // UI Event Listeners
+        elCpuThresh.addEventListener('input', (e) => elCpuThreshVal.textContent = e.target.value + '%');
+        elRamThresh.addEventListener('input', (e) => elRamThreshVal.textContent = e.target.value + '%');
+
+        function addLog(message, type = 'normal') {
+            const div = document.createElement('div');
+            div.className = 'console-item';
+            if (type === 'throttle') div.classList.add('log-throttle');
+            if (type === 'reduce') div.classList.add('log-reduce');
+            
+            const time = new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            div.innerHTML = `<strong>[${time}]</strong> ${message}`;
+            
+            consoleLog.appendChild(div);
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+            
+            // Keep max 30 recent logs
+            if (consoleLog.children.length > 30) {
+                consoleLog.removeChild(consoleLog.firstChild);
+            }
+        }
+
+        function startMonitoring() {
+            isMonitoring = true;
+            btnStart.disabled = true;
+            btnStop.disabled = false;
+            consoleLog.innerHTML = '';
+            addLog("System Monitoring initialized...");
+            elSystemStatus.className = "status-badge status-normal";
+            elSystemStatus.textContent = "System Status: Normal";
+
+            // Main tick
+            simInterval1 = setInterval(runTick, 1000);
+            
+            // Program generation
+            simInterval2 = setInterval(generateProgram, 3000);
+        }
+
+        function stopMonitoring() {
+            isMonitoring = false;
+            btnStart.disabled = false;
+            btnStop.disabled = true;
+            clearInterval(simInterval1);
+            clearInterval(simInterval2);
+            activePrograms = [];
+            
+            elCpuBar.style.width = '0%';
+            elRamBar.style.width = '0%';
+            elCpuUsageVal.textContent = '0%';
+            elRamUsageVal.textContent = '0%';
+            elCpuBar.classList.remove('danger-fill');
+            elRamBar.classList.remove('danger-fill');
+            
+            elSystemStatus.className = "status-badge status-normal";
+            elSystemStatus.textContent = "System Status: Stopped";
+            addLog("Monitoring terminated.");
+        }
+
+        function generateProgram() {
+            if (!isMonitoring) return;
+            const pid = Math.floor(Math.random() * 900) + 100;
+            const progCpu = (Math.random() * 15 + 5); 
+            const progRam = (Math.random() * 10 + 2);
+            
+            const program = { id: `Program_${pid}`, cpu: progCpu, ram: progRam };
+            activePrograms.push(program);
+            
+            addLog(`Spawned <strong>${program.id}</strong> - CPU: ${progCpu.toFixed(1)}%, RAM: ${progRam.toFixed(1)}%`);
+            updateResourceImpact();
+        }
+
+        function updateResourceImpact() {
+            // Base usage plus active programs
+            let calcCpu = 15;
+            let calcRam = 25;
+            
+            activePrograms.forEach(p => {
+                calcCpu += p.cpu;
+                calcRam += p.ram;
+            });
+
+            // Fluctuation
+            calcCpu += (Math.random() * 10 - 5);
+            calcRam += (Math.random() * 4 - 2);
+
+            cpuUsage = Math.max(5, Math.min(99, calcCpu));
+            ramUsage = Math.max(10, Math.min(99, calcRam));
+        }
+
+        function runTick() {
+            // Update UI
+            elCpuUsageVal.textContent = cpuUsage.toFixed(1) + '%';
+            elRamUsageVal.textContent = ramUsage.toFixed(1) + '%';
+            elCpuBar.style.width = cpuUsage + '%';
+            elRamBar.style.width = ramUsage + '%';
+
+            const limitCpu = parseFloat(elCpuThresh.value);
+            const limitRam = parseFloat(elRamThresh.value);
+
+            let statusColor = "normal";
+            let statusText = "System Status: Normal";
+
+            if (cpuUsage > limitCpu || ramUsage > limitRam) {
+                statusColor = "danger";
+                statusText = "High Usage Detected!";
+                if (cpuUsage > limitCpu) elCpuBar.classList.add('danger-fill');
+                if (ramUsage > limitRam) elRamBar.classList.add('danger-fill');
+            } else {
+                elCpuBar.classList.remove('danger-fill');
+                elRamBar.classList.remove('danger-fill');
+            }
+
+            elSystemStatus.className = `status-badge status-${statusColor}`;
+            elSystemStatus.textContent = statusText;
+
+            // Allocation Algorithms
+            if (cpuUsage > limitCpu) {
+                throttleLowPriority();
+            } else if (ramUsage > limitRam) {
+                reduceMemoryUsage();
+            }
+
+            // Natural fluctuation
+            if(activePrograms.length > 0) {
+                updateResourceImpact();
+            } else {
+                cpuUsage = Math.max(10, cpuUsage - (Math.random() * 5));
+                ramUsage = Math.max(15, ramUsage - (Math.random() * 2));
+            }
+        }
+
+        function throttleLowPriority() {
+            if (activePrograms.length > 0) {
+                const target = activePrograms.shift(); // remove oldest
+                addLog(`Action: Throttled low-priority process <strong>${target.id}</strong> to save CPU.`, 'throttle');
+                updateResourceImpact();
+            }
+        }
+
+        function reduceMemoryUsage() {
+            if (activePrograms.length > 0) {
+                // sort by highest ram usage to kill
+                activePrograms.sort((a,b) => b.ram - a.ram);
+                const target = activePrograms.shift();
+                addLog(`Action: Terminated <strong>${target.id}</strong> to free memory (RAM).`, 'reduce');
+                updateResourceImpact();
+            }
+        }
+    </script>
 </body>
 </html>
