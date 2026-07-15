@@ -1,71 +1,163 @@
-# Adaptive-Resource-Allocation-in-Multiprogramming-Systems
-A System that dynamically adjusts resource allocation among  multiple programs to optimize CPU and memory utilization. The solution should monitor  system performance and reallocate resources in real-time to prevent bottlenecks.
+# 🖥️ Adaptive Resource Allocation in Multiprogramming Systems
 
-# Project Overview
-A dynamic resource allocation framework operates within multiprogramming environments where it runs through Python programming code. Real-time CPU and memory usage tracking by the system initiates resource distribution between programs after utility-defined thresholds are breached. The Tkinter GUI provides user interface visibility for the system along with performance improvement demonstrations that overcome system blocking problems.
+A Python-based simulation system that monitors CPU and memory utilization in real time and demonstrates adaptive resource management strategies in a multiprogramming environment.
 
+The application uses a Tkinter-based graphical interface to simulate program execution and apply threshold-based actions such as throttling low-priority tasks and reducing memory usage when system resources exceed predefined limits.
 
-# Problem Statement
-A multiprogramming system operates multiple concurrently running programs that both share computer resources such as CPU time and memory capacity. Without dynamic management these computer systems encounter insufficient performance and functional decline and system crashes. A real-time adaptive resource monitoring system represents the primary solution explained within this project.
+---
 
+## 📌 Project Overview
 
-# Objectives
-The system provides continuous observation of CPU performance and memory consumption levels.
-The system should execute simulations which use programs that need different resources.
-The system should implement real-time resource allocation and reduction strategies when monitoring threshold levels are reached.
-The system presents textual and visual depictions which show program execution and system operational status.
-The system prevents performance reductions which occur because of excessive system resource utilization.
+In a multiprogramming environment, multiple programs compete for limited system resources such as CPU and memory. Excessive resource consumption can lead to performance degradation and reduced system responsiveness.
 
-# Methodology
+This project simulates an adaptive resource allocation mechanism that continuously monitors system resource usage and performs corrective actions when utilization exceeds user-defined thresholds.
 
-# System Architecture
-**Frontend:** Tkinter GUI
-  **Backend:** The system implements a Backend section based on Python code alongside psutil and threading applications.
-**Modules:**
-  - Resource monitor thread (real-time stats)
-  The second thread simulates programs through randomly generated usage.
-  The system contains an adaptive control mechanism which performs resource reduction or throttling operations.
+---
 
+## 🎯 Objectives
 
-# Algorithms
-**Monitoring:** Periodically fetches CPU/memory stats and compares to thresholds.
-- *Adaptive Logic: 
-  - If CPU > threshold -> Throttle (Slow down or remove background/simulated programs that are less important to reduce CPU usage)low-priority programs.
-  The system will either eliminate completely or cut down simulated software processes when memory usage exceeds the set threshold value.
+- Monitor CPU utilization in real time.
+- Monitor memory utilization in real time.
+- Simulate multiple programs with varying resource requirements.
+- Apply threshold-based resource management strategies.
+- Demonstrate adaptive resource allocation concepts.
+- Provide a graphical interface for monitoring system performance.
 
-#  Technologies Used
-| Component          | Tool/Library        |
-|-------------------|---------------------|
-| Programming Lang. | Python              |
-| GUI               | Tkinter             |
-| Monitoring        | psutil              |
-The implementation of threading serves as the concurrent execution system.
-| Visualization     |
+---
 
+## ✨ Features
 
-#  Case Studies
-## Case Study 1
-- **CPU Threshold:** 70%
-- **Memory Threshold:** 80%
-- **Simulated Programs:** 10
-The system adapted when memory consumption exceeded 75% but the CPU remained stable. Memory usage stabilized without overloading.
+### Real-Time Resource Monitoring
+- Live CPU usage monitoring using psutil.
+- Live memory usage monitoring.
+- Dynamic status updates based on system conditions.
 
-## Case Study 2
-- **CPU Threshold:** 60%
-- **Memory Threshold:** 75%
-- **Simulated Programs:** 8
-  
-The system adapted when memory consumption exceeded 75% but the CPU remained stable. Memory usage stabilized without overloading.
+### User-Defined Thresholds
+- Custom CPU utilization threshold.
+- Custom memory utilization threshold.
+- Interactive threshold configuration through GUI.
 
+### Program Simulation
+- Simulates multiple running programs.
+- Generates varying CPU and memory workloads.
+- Displays active program information.
 
+### Adaptive Resource Management
+- Throttles low-priority simulated programs when CPU usage exceeds the threshold.
+- Reduces memory load by removing simulated programs when memory usage exceeds the threshold.
+- Demonstrates threshold-based resource management strategies.
 
-##  Sample Output
+### Graphical User Interface
+- Built using Tkinter.
+- Interactive monitoring dashboard.
+- Real-time status display.
+
+---
+
+## 🛠️ Technologies Used
+
+| Component | Technology |
+|------------|------------|
+| Programming Language | Python |
+| GUI Framework | Tkinter |
+| System Monitoring | psutil |
+| Multithreading | threading |
+| Simulation | random |
+| Time Management | time |
+
+---
+
+## 🏗️ System Architecture
+
+### Resource Monitoring Module
+Continuously tracks CPU and memory utilization using the psutil library.
+
+### Program Simulation Module
+Generates simulated programs with random CPU and memory consumption patterns.
+
+### Adaptive Control Module
+Applies threshold-based actions to reduce system load when resource utilization exceeds predefined limits.
+
+### User Interface Module
+Provides real-time visualization of system status and simulated program activity.
+
+---
+
+## ⚙️ Working Principle
+
+1. User specifies CPU and memory thresholds.
+2. Resource monitoring begins.
+3. Simulated programs are generated continuously.
+4. System usage is monitored in real time.
+5. When CPU usage exceeds the threshold:
+   - Low-priority simulated programs are throttled.
+6. When memory usage exceeds the threshold:
+   - Simulated programs are removed to reduce memory load.
+7. Updated system status is displayed through the GUI.
+
+---
+
+## 📂 Project Structure
 
 ```text
-CPU Usage: 80%
-Memory Usage: 80%
-Status: System Status: Normal
+Adaptive-Resource-Allocation/
+│
+├── main.py
+├── background1.jpg
+├── background2.jpg
+├── background3.jpg
+└── README.md
+```
 
-Program_39 - CPU: 10.9%, Memory: 146.2MB
+---
 
-Memory Reduced: Program_39 - CPU: 6.4%, Memory: 77.0MB
+## 🖥️ Sample Output
+
+```text
+CPU Usage: 82%
+Memory Usage: 76%
+
+Status: High CPU Usage Detected!
+
+Program_42 - CPU: 15.6%, Memory: 125.4MB
+
+Throttled: Program_42
+```
+
+---
+
+## 📚 Concepts Demonstrated
+
+- Multiprogramming
+- Resource Allocation
+- CPU Scheduling Concepts
+- Memory Management Concepts
+- System Monitoring
+- Multithreading
+- GUI Development
+- Operating System Fundamentals
+
+---
+
+## 🚀 Future Enhancements
+
+- Real process monitoring and management.
+- Resource usage visualization using charts and graphs.
+- Process prioritization algorithms.
+- Advanced scheduling techniques.
+- Historical resource usage analytics.
+- Database integration for logging and reporting.
+- Web-based monitoring dashboard.
+
+---
+
+## 🎓 Learning Outcomes
+
+- Operating System Concepts
+- Python Application Development
+- Tkinter GUI Programming
+- Multithreading in Python
+- System Resource Monitoring
+- Adaptive Control Strategies
+- Software Design and Simulation
+
